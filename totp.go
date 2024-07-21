@@ -2,7 +2,6 @@ package totp
 
 import (
 	"crypto/hmac"
-	"crypto/sha256"
 	"fmt"
 	"math"
 	"net/url"
@@ -13,14 +12,19 @@ type TOTP struct {
 	Secret   string
 	interval int64
 	digit    int
+	hashType hashType
 	Url      string
 }
 
-func New(secret string) (t TOTP) {
+func New(shaType, secret string) (t TOTP) {
 	if secret == "" {
 		t.Secret = RandomSecret(10)
 	} else {
 		t.Secret = secret
+	}
+	t.hashType = ShaSelect(shaType)
+	if t.hashType.Label == "" {
+		panic("totp: type sha")
 	}
 	t.digit = 6
 	t.interval = 30
@@ -34,7 +38,7 @@ func (t *TOTP) GetUrl(account, issuer string) string {
 		label = url.PathEscape(issuer) + ":" + label
 		query.Set("issuer", issuer)
 	}
-	query.Set("algorithm", "SHA256")
+	query.Set("algorithm", t.hashType.Label)
 	query.Set("secret", t.Secret)
 	uri := url.URL{
 		Scheme:   "otpauth",
@@ -50,7 +54,7 @@ func (t *TOTP) generateOTP(input int64) string {
 	if input < 0 {
 		panic("input must be positive integer")
 	}
-	hash := hmac.New(sha256.New, byteSecret(t.Secret))
+	hash := hmac.New(t.hashType.Hash, byteSecret(t.Secret))
 	hash.Write(writeByte(input))
 	hmacHash := hash.Sum(nil)
 
