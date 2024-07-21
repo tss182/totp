@@ -12,7 +12,7 @@ type TOTP struct {
 	Secret   string
 	interval int64
 	digit    int
-	hashType hashType
+	hashType HashType
 	Url      string
 }
 

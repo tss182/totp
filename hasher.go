@@ -8,7 +8,7 @@ import (
 )
 
 type (
-	hashType struct {
+	HashType struct {
 		Label string
 		Hash  func() hash.Hash
 	}
@@ -18,15 +18,15 @@ const Sha1 = "SHA1"
 const Sha256 = "SHA256"
 const Sha512 = "SHA512"
 
-func ShaSelect(label string) hashType {
-	data := []hashType{{
+func ShaSelect(label string) HashType {
+	data := []HashType{{
 		Label: Sha1,
 		Hash:  sha1.New,
 	},
 		{Label: Sha256, Hash: sha256.New},
 		{Label: Sha512,
 			Hash: sha512.New}}
-	var selected hashType
+	var selected HashType
 	for _, v := range data {
 		if v.Label == label {
 			selected = v
