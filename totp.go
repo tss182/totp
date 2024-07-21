@@ -34,7 +34,7 @@ func (t *TOTP) GetUrl(account, issuer string) string {
 		label = url.PathEscape(issuer) + ":" + label
 		query.Set("issuer", issuer)
 	}
-	query.Set("algorithm", "sha256")
+	query.Set("algorithm", "SHA256")
 	query.Set("secret", t.Secret)
 	uri := url.URL{
 		Scheme:   "otpauth",
